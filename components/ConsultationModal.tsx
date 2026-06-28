@@ -1,14 +1,12 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import emailjs from "@emailjs/browser"
-import ReCAPTCHA from "react-google-recaptcha"
 import { X, Calendar, Clock, Briefcase } from "lucide-react"
 
 const EMAILJS_SERVICE_ID  = "service_p89xvrr"
 const EMAILJS_TEMPLATE_ID = "template_wo2h41l"
 const EMAILJS_PUBLIC_KEY  = "SV8RBoTX1-9pKyU-O"
-const RECAPTCHA_SITE_KEY  = "6Le07DktAAAADFxeGpW7Bhaf5aOfB6yod5hs6A2"
 
 type Status = "idle" | "sending" | "success" | "error"
 
@@ -39,17 +37,15 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
   const [form, setForm] = useState({
     name: "", email: "", service: "", budget: "", message: "",
   })
+  const [honeypot, setHoneypot] = useState("") // spam trap
   const [status, setStatus] = useState<Status>("idle")
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const recaptchaRef = useRef<ReCAPTCHA>(null)
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : ""
     if (!isOpen) {
       setForm({ name: "", email: "", service: "", budget: "", message: "" })
       setStatus("idle")
-      setCaptchaToken(null)
-      recaptchaRef.current?.reset()
+      setHoneypot("")
     }
     return () => { document.body.style.overflow = "" }
   }, [isOpen])
@@ -67,10 +63,7 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (status === "sending") return
-    if (!captchaToken) {
-      alert("Please complete the reCAPTCHA verification.")
-      return
-    }
+    if (honeypot) return // bot detected
     setStatus("sending")
     try {
       await emailjs.send(
@@ -83,15 +76,12 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
           budget:     form.budget,
           message:    form.message,
           reply_to:   form.email,
-          "g-recaptcha-response": captchaToken,
         },
         EMAILJS_PUBLIC_KEY
       )
       setStatus("success")
     } catch {
       setStatus("error")
-      recaptchaRef.current?.reset()
-      setCaptchaToken(null)
     }
   }
 
@@ -99,14 +89,12 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Modal */}
       <div
         role="dialog"
         aria-modal="true"
@@ -115,7 +103,6 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
       >
         <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/50">
 
-          {/* Close button */}
           <button
             onClick={onClose}
             aria-label="Close"
@@ -124,7 +111,6 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
             <X size={16} />
           </button>
 
-          {/* Header */}
           <div className="px-6 pt-6 pb-5 border-b border-slate-800">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-300 mb-3">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
@@ -147,7 +133,6 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
             </div>
           </div>
 
-          {/* Success screen */}
           {status === "success" ? (
             <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/30">
@@ -168,6 +153,17 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-6 py-6">
+
+              {/* Honeypot — invisible to humans */}
+              <input
+                type="text"
+                name="website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                style={{ display: "none" }}
+                tabIndex={-1}
+                autoComplete="off"
+              />
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
@@ -224,20 +220,9 @@ export default function ConsultationModal({ isOpen, onClose }: Props) {
                 />
               </div>
 
-              {/* reCAPTCHA */}
-              <div className="flex justify-start">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={RECAPTCHA_SITE_KEY}
-                  theme="dark"
-                  onChange={(token) => setCaptchaToken(token)}
-                  onExpired={() => setCaptchaToken(null)}
-                />
-              </div>
-
               <button
                 type="submit"
-                disabled={status === "sending" || !captchaToken}
+                disabled={status === "sending"}
                 className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 hover:bg-cyan-400 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {status === "sending" ? (
