@@ -1,22 +1,19 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import emailjs from "@emailjs/browser"
-import ReCAPTCHA from "react-google-recaptcha"
 import SectionWrapper from "@/components/SectionWrapper"
 
 const EMAILJS_SERVICE_ID  = "service_p89xvrr"
 const EMAILJS_TEMPLATE_ID = "template_wo2h41l"
 const EMAILJS_PUBLIC_KEY  = "SV8RBoTX1-9pKyU-O"
-const RECAPTCHA_SITE_KEY  = "6Le07DktAAAADFxeGpW7Bhaf5aOfB6yod5hs6A2"
 
 type Status = "idle" | "sending" | "success" | "error"
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" })
+  const [honeypot, setHoneypot] = useState("") // spam trap
   const [status, setStatus] = useState<Status>("idle")
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const recaptchaRef = useRef<ReCAPTCHA>(null)
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -25,10 +22,8 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (status === "sending") return
-    if (!captchaToken) {
-      alert("Please complete the reCAPTCHA verification.")
-      return
-    }
+    // Honeypot check — bots fill hidden fields, humans don't
+    if (honeypot) return
     setStatus("sending")
     try {
       await emailjs.send(
@@ -39,18 +34,13 @@ export default function Contact() {
           from_email: form.email,
           message:    form.message,
           reply_to:   form.email,
-          "g-recaptcha-response": captchaToken,
         },
         EMAILJS_PUBLIC_KEY
       )
       setStatus("success")
       setForm({ name: "", email: "", message: "" })
-      recaptchaRef.current?.reset()
-      setCaptchaToken(null)
     } catch {
       setStatus("error")
-      recaptchaRef.current?.reset()
-      setCaptchaToken(null)
     }
   }
 
@@ -77,7 +67,6 @@ export default function Contact() {
 
           {/* LEFT: contact info */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-
             <a
               href="mailto:marceejayfernando@gmail.com"
               className="group flex items-start gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-cyan-500/40 hover:bg-slate-800/60 transition-all duration-200"
@@ -121,7 +110,6 @@ export default function Contact() {
                 <span className="font-semibold text-emerald-400">Available</span> for freelance &amp; contract work
               </p>
             </div>
-
           </div>
 
           {/* RIGHT: form */}
@@ -129,6 +117,17 @@ export default function Contact() {
             onSubmit={handleSubmit}
             className="lg:col-span-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-8 flex flex-col gap-5"
           >
+            {/* Honeypot — hidden from humans, bots fill this */}
+            <input
+              type="text"
+              name="website"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={{ display: "none" }}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="name" className="text-sm font-medium text-slate-400">Your name</label>
@@ -160,20 +159,9 @@ export default function Contact() {
               />
             </div>
 
-            {/* reCAPTCHA */}
-            <div className="flex justify-start">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={RECAPTCHA_SITE_KEY}
-                theme="dark"
-                onChange={(token) => setCaptchaToken(token)}
-                onExpired={() => setCaptchaToken(null)}
-              />
-            </div>
-
             <button
               type="submit"
-              disabled={status === "sending" || !captchaToken}
+              disabled={status === "sending"}
               className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 hover:bg-cyan-400 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
             >
               {status === "sending" ? (
