@@ -61,5 +61,25 @@ const projects = [
     demo: "#",
     workflow: "#",
   },
+  {
+    title: "UGC Ad Video Generator",
+    description:
+      "Automatically generates UGC-style ad videos from a Google Sheet using AI image and video prompts, Veo, and Kie AI.",
+    tech: ["n8n", "Veo", "Kie AI"],
+    image: "/images/projects/UGC-Instant.png",
+    featured: false,
+    demo: "#",
+    workflow: "#",
+  },
+  {
+    title: "YouTube Shorts Automation",
+    description:
+      "End-to-end pipeline that generates AI images, videos, and voiceovers, renders the final video, and auto-uploads to YouTube with email notifications.",
+    tech: ["n8n", "OpenAI", "YouTube API"],
+    image: "/images/projects/Youtube-Automation.png",
+    featured: false,
+    demo: "#",
+    workflow: "#",
+  },
 ];
 export default projects;
