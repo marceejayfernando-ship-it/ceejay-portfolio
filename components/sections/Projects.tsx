@@ -2,8 +2,17 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import projects from "@/data/projects";
+import { useMemo, useRef, useState } from "react";
+import { Star, ArrowUpRight, Play } from "lucide-react";
+
+import projects, {
+  activeCategories,
+  filterProjects,
+  type Project,
+  type ProjectCategory,
+} from "@/data/projects";
 import SectionWrapper from "@/components/SectionWrapper";
+import ProjectModal from "@/components/sections/ProjectModal";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
@@ -20,40 +29,101 @@ import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
-import { useState } from "react";
+type Filter = "All" | ProjectCategory;
+
+const FILTERS: Filter[] = ["All", ...activeCategories];
 
 export default function Projects() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [selected, setSelected] = useState<Project | null>(null);
+  const [filter, setFilter] = useState<Filter>("All");
+  const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const visible = useMemo(() => filterProjects(filter), [filter]);
+
+  const changeFilter = (next: Filter) => {
+    setFilter(next);
+    setActiveIndex(0);
+  };
+
+  const onKeyNav = (e: React.KeyboardEvent, index: number) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    const dir = e.key === "ArrowRight" ? 1 : -1;
+    const nextIndex = (index + dir + FILTERS.length) % FILTERS.length;
+    btnRefs.current[nextIndex]?.focus();
+    changeFilter(FILTERS[nextIndex]);
+  };
 
   return (
     <SectionWrapper id="projects" glowPosition="top-right" className="py-24">
-
-      {/* Heading */}
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-3xl px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center"
         >
-          <p className="mb-3 font-semibold uppercase tracking-[0.3em] text-cyan-400">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-400">
             Projects
           </p>
-          <h2 className="text-5xl font-black text-white">
-            AI Automation Solutions That Save Businesses Time & Money
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Automation &amp; QA projects I&apos;ve built
           </h2>
-          <p className="mx-auto mt-6 mb-16 max-w-2xl text-slate-400">
-            Explore AI automation solutions I've built using n8n, Make.com,
-            APIs, OpenAI, Gemini, and modern no-code tools to help businesses
-            automate repetitive work.
+          <p className="mx-auto mt-4 max-w-xl text-sm text-slate-400 md:text-base">
+            Self-built and hands-on training projects — Playwright and Tricentis
+            Tosca test automation, plus AI and business automation with n8n,
+            GoHighLevel, Make, and the OpenAI and Gemini APIs. These are
+            portfolio and training builds, not client work. Tap a card for the
+            full breakdown.
           </p>
         </motion.div>
       </div>
 
-      {/* Swiper — full width outside max-w container */}
-      <div className="w-full pb-16">
+      {/* Filter bar */}
+      <div
+        role="group"
+        aria-label="Filter projects by category"
+        className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-2 px-6"
+      >
+        {FILTERS.map((cat, i) => {
+          const active = filter === cat;
+          return (
+            <button
+              key={cat}
+              ref={(el) => {
+                btnRefs.current[i] = el;
+              }}
+              type="button"
+              aria-pressed={active}
+              tabIndex={active ? 0 : -1}
+              onClick={() => changeFilter(cat)}
+              onKeyDown={(e) => onKeyNav(e, i)}
+              className={`rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-wide transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
+                active
+                  ? "border-cyan-400 bg-cyan-500/15 text-cyan-300"
+                  : "border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200"
+              }`}
+            >
+              {cat}
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="mt-4 text-center text-xs text-slate-500" aria-live="polite">
+        Showing {visible.length} of {projects.length} projects
+      </p>
+
+      <motion.div
+        key={filter}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.35 }}
+        className="mt-6 w-full pb-8"
+      >
         <Swiper
+          key={filter}
           effect="coverflow"
           grabCursor
           centeredSlides
@@ -61,102 +131,111 @@ export default function Projects() {
           loop={false}
           keyboard={{ enabled: true }}
           autoplay={{
-            delay: 3500,
-            disableOnInteraction: false,
+            delay: 4000,
+            disableOnInteraction: true,
             pauseOnMouseEnter: true,
           }}
           coverflowEffect={{
-            rotate: 10,
-            stretch: 80,
-            depth: 200,
+            rotate: 8,
+            stretch: 60,
+            depth: 180,
             modifier: 1,
             slideShadows: false,
-            scale: 0.9,
+            scale: 0.92,
           }}
           pagination={{ clickable: true }}
           navigation
-          onSlideChange={(swiper: SwiperType) => setActiveIndex(swiper.realIndex)}
+          onSlideChange={(s: SwiperType) => setActiveIndex(s.realIndex)}
           modules={[EffectCoverflow, Pagination, Navigation, Autoplay, Keyboard]}
-          className="mySwiper py-10"
+          className="!px-4 !py-10"
         >
-          {projects.map((project, index) => (
-            <SwiperSlide key={project.title} style={{ width: "380px" }}>
-              <motion.div
-                whileHover={{ y: -8 }}
-                transition={{ duration: 0.4 }}
-                className={`
-                  group relative overflow-hidden rounded-3xl border
-                  backdrop-blur-xl transition-all duration-500
-                  ${
-                    index === activeIndex
-                      ? "border-cyan-400 shadow-[0_0_60px_rgba(6,182,212,0.45)]"
+          {visible.map((project, index) => {
+            const isActive = index === activeIndex;
+            return (
+              <SwiperSlide key={project.slug} style={{ width: "360px" }}>
+                <motion.button
+                  type="button"
+                  onClick={() => setSelected(project)}
+                  whileHover={{ y: -6 }}
+                  transition={{ duration: 0.3 }}
+                  aria-label={`View details for ${project.title}`}
+                  className={`group block w-full overflow-hidden rounded-3xl border text-left backdrop-blur-xl transition-all duration-500 ${
+                    isActive
+                      ? "border-cyan-400/70 shadow-[0_0_45px_rgba(6,182,212,0.30)]"
                       : "border-slate-700"
-                  }
-                `}
-              >
-                {/* Thumbnail */}
-                <div className="relative h-40 overflow-hidden">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    sizes="380px"
-                    className="z-0 object-cover"
-                  />
-                  {project.featured && (
-                    <span className="absolute top-4 left-4 z-20 rounded-full bg-cyan-500 px-3 py-1 text-xs font-semibold text-white">
-                      Featured
-                    </span>
-                  )}
-                </div>
-
-                {/* Body */}
-                <div className="bg-slate-900 p-5">
-                  <h3 className="mb-3 text-xl font-bold text-white">
-                    {project.title}
-                  </h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">
-                    {project.description}
-                  </p>
-
-                  {/* Tech tags */}
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {project.tech.map((tech) => (
-                      <span
-                        key={tech}
-                        className="rounded-full bg-cyan-500/10 px-3 py-1 text-xs text-cyan-400"
-                      >
-                        {tech}
+                  } ${project.featured ? "ring-1 ring-cyan-500/20" : ""}`}
+                >
+                  <div
+                    className={`relative h-40 overflow-hidden ${
+                      project.imageFit === "contain" ? "bg-slate-200" : ""
+                    }`}
+                  >
+                    <Image
+                      src={project.image}
+                      alt={`${project.title} preview`}
+                      fill
+                      sizes="360px"
+                      className={
+                        project.imageFit === "contain"
+                          ? "object-contain p-2"
+                          : "object-cover transition-transform duration-500 group-hover:scale-105"
+                      }
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent" />
+                    {project.video && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950/70 text-white ring-1 ring-white/30 transition-transform duration-300 group-hover:scale-110">
+                          <Play size={16} className="ml-0.5 fill-white" />
+                        </span>
+                      </div>
+                    )}
+                    <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+                      {project.featured && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-cyan-500 px-2.5 py-1 text-[11px] font-semibold text-white">
+                          <Star size={11} className="fill-white" /> Featured
+                        </span>
+                      )}
+                      <span className="rounded-full bg-slate-950/80 px-2.5 py-1 text-[11px] font-medium text-cyan-300">
+                        {project.type}
                       </span>
-                    ))}
+                    </div>
                   </div>
 
-                  {/* Action buttons */}
-                  <div className="mt-5 flex gap-3">
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-cyan-400"
-                    >
-                      Case study
-                    </a>
-                    <a
-                      href={project.workflow}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-lg border border-cyan-400/40 bg-slate-800 px-4 py-2 text-sm text-white transition hover:border-cyan-400"
-                    >
-                      Workflow
-                    </a>
+                  <div className="bg-slate-900 p-5">
+                    <h3 className="text-lg font-bold text-white">
+                      {project.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                      {project.description}
+                    </p>
+
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-[11px] font-medium text-cyan-400"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-400 transition-colors group-hover:text-cyan-300">
+                      View details
+                      <ArrowUpRight
+                        size={15}
+                        className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </span>
                   </div>
-                </div>
-              </motion.div>
-            </SwiperSlide>
-          ))}
+                </motion.button>
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
-      </div>
+      </motion.div>
 
+      <ProjectModal project={selected} onClose={() => setSelected(null)} />
     </SectionWrapper>
   );
 }

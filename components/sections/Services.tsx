@@ -1,150 +1,114 @@
 "use client";
 
-import { Bot, Workflow, Link2, MessageSquare, Laptop, Video } from "lucide-react";
 import { motion } from "framer-motion";
+import { ShieldCheck, FlaskConical, Bot, Contact } from "lucide-react";
 import SectionWrapper from "@/components/SectionWrapper";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const services = [
+const pillars = [
+  {
+    icon: ShieldCheck,
+    title: "Quality Engineering",
+    tag: "Professional",
+    tagClass: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+    description:
+      "Functional, regression and integration testing for enterprise applications — test case design, defect management in Jira, UAT support, and SQL data validation across SAP and PeopleSoft.",
+    items: ["Test Case Design", "Defect Management", "SAP / PeopleSoft", "UAT"],
+  },
+  {
+    icon: FlaskConical,
+    title: "Test Automation",
+    tag: "Learning",
+    tagClass: "border-amber-500/30 bg-amber-500/10 text-amber-300",
+    description:
+      "Hands-on with Playwright + TypeScript — built into a working Page Object Model framework with data-driven tests and cross-browser runs — plus hands-on training in Tricentis Tosca.",
+    items: ["Playwright", "Tricentis Tosca", "Page Object Model", "Cross-Browser Testing"],
+  },
   {
     icon: Bot,
     title: "AI Automation",
-    description: "Automate repetitive business processes using AI-powered workflows.",
-    tech: ["OpenAI", "Gemini", "n8n", "Zapier"],
+    tag: "Project",
+    tagClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
+    description:
+      "Building AI agents and automations with n8n, Claude Code, and the OpenAI and Gemini APIs — RAG pipelines, chatbots, and API integrations that remove repetitive work.",
+    items: ["n8n", "Claude Code", "AI Agents", "RAG"],
   },
   {
-    icon: Workflow,
-    title: "Workflow Automation",
-    description: "Build intelligent workflows with n8n, Make.com, and Zapier.",
-    tech: ["n8n", "Make.com", "Zapier"],
-  },
-  {
-    icon: Link2,
-    title: "API Integration",
-    description: "Connect your apps and automate data between different platforms.",
-    tech: ["REST", "Webhooks", "n8n", "Make.com"],
-  },
-  {
-    icon: MessageSquare,
-    title: "AI Chatbots",
-    description: "Create AI assistants powered by OpenAI and Gemini.",
-    tech: ["OpenAI", "Gemini", "Supabase", "n8n"],
-  },
-  {
-    icon: Laptop,
-    title: "Technical Virtual Assistant",
-    description: "Technical support, automation setup, documentation, and system management.",
-    tech: ["Notion", "GitHub", "Zapier", "Make.com"],
-  },
-  {
-    icon: Video,
-    title: "YouTube Automation",
-    description: "Automate YouTube content creation, publishing, and workflows.",
-    tech: ["n8n", "OpenAI", "Make.com"],
+    icon: Contact,
+    title: "Business Automation",
+    tag: "Project",
+    tagClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
+    description:
+      "CRM and no-code automation — hands-on GoHighLevel training for leads, pipelines and follow-ups, plus Make.com and Zapier scenarios for business workflows.",
+    items: ["GoHighLevel", "Make.com", "Zapier", "CRM Pipelines"],
   },
 ];
-
-// ─── Animation variants ────────────────────────────────────────────────────────
 
 const containerVariants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.1 } },
 };
-
 const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45 } },
 };
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Services() {
   return (
-    <SectionWrapper id="services" glowPosition="bottom-left" className="py-24">
-      <div className="mx-auto max-w-7xl px-6">
-
-        {/* Heading */}
-        <div className="text-center">
-          <p className="mb-3 font-semibold uppercase tracking-[0.3em] text-cyan-400">
-            Services
+    <SectionWrapper id="expertise" glowPosition="bottom-left" className="py-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="mx-auto mb-14 max-w-2xl text-center">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-400">
+            What I Do
           </p>
-
-          <h2 className="mt-4 text-5xl font-black text-white">
-            What I Can Help You With
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Four connected areas of work
           </h2>
-
-          <p className="mx-auto mt-6 max-w-2xl text-slate-400">
-            Helping businesses streamline operations using AI, workflow
-            automation, API integrations, and intelligent systems.
+          <p className="mt-4 text-sm text-slate-400 md:text-base">
+            Each label below reflects how I actually use the skill — professional
+            work, active learning, or portfolio projects.
           </p>
         </div>
 
-        {/* Cards */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="mt-16 grid items-start gap-8 md:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
         >
-          {services.map((service) => {
-            const Icon = service.icon;
-
-            return (
-              <motion.div
-                key={service.title}
-                variants={cardVariants}
-                whileHover={{ y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="rounded-3xl border border-slate-700 bg-slate-900/60 p-7 backdrop-blur-xl transition-all hover:border-cyan-400 hover:shadow-[0_0_40px_rgba(6,182,212,.18)]"
-              >
-                {/* Icon */}
-                <div className="mb-5 inline-flex rounded-2xl bg-cyan-500/10 p-4">
-                  <Icon className="h-8 w-8 text-cyan-400" />
+          {pillars.map(({ icon: Icon, title, tag, tagClass, description, items }) => (
+            <motion.div
+              key={title}
+              variants={cardVariants}
+              className="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 p-6 transition-all hover:border-cyan-500/40 hover:shadow-[0_0_30px_rgba(6,182,212,0.12)]"
+            >
+              <div className="flex items-center justify-between">
+                <div className="inline-flex rounded-xl bg-cyan-500/10 p-3">
+                  <Icon className="h-6 w-6 text-cyan-400" />
                 </div>
-
-                {/* Title */}
-                <h3 className="text-2xl font-bold text-white">
-                  {service.title}
-                </h3>
-
-                {/* Description */}
-                <p className="mt-4 leading-7 text-slate-400">
-                  {service.description}
-                </p>
-
-                {/* Divider */}
-                <div className="my-5 h-px bg-slate-700" />
-
-                {/* Tech stack */}
-                <h4 className="mb-3 text-xs uppercase tracking-[0.25em] text-cyan-400 opacity-80">
-                  Tech Stack
-                </h4>
-
-                <div className="flex flex-wrap gap-2">
-                  {service.tech.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-300 transition-all duration-300 hover:scale-105 hover:border-cyan-400/50 hover:bg-cyan-500/20 hover:shadow-[0_0_35px_rgba(6,182,212,0.18)]"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-
-                {/* CTA */}
-                <a
-                  href="#contact"
-                  className="mt-8 block w-full rounded-xl border border-cyan-500 py-3 text-center font-semibold text-cyan-400 transition-all hover:bg-cyan-500 hover:text-white"
+                <span
+                  className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${tagClass}`}
                 >
-                  Start Your Project →
-                </a>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+                  {tag}
+                </span>
+              </div>
 
+              <h3 className="mt-5 text-lg font-bold text-white">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-400">{description}</p>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {items.map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full border border-slate-700 bg-slate-800/50 px-2.5 py-1 text-xs text-slate-300"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </SectionWrapper>
   );

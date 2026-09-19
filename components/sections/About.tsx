@@ -3,180 +3,183 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import SectionWrapper from "@/components/SectionWrapper";
+import { profile } from "@/data/profile";
 import {
-  Bot,
+  ClipboardCheck,
   Workflow,
-  Link2,
-  Sparkles,
-  Brain,
+  Bot,
   Database,
-  Check,
+  Bug,
+  ShieldCheck,
+  ArrowRight,
 } from "lucide-react";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const skills = [
-  "AI Automation",
-  "n8n",
-  "Make.com",
-  "Zapier",
-  "OpenAI",
-  "Gemini",
-  "API Integration",
-  "Technical VA",
-];
-
 const floatingIcons = [
-  { icon: Bot,      className: "-top-10 -left-6"  },
-  { icon: Workflow, className: "-top-10 right-12"  },
-  { icon: Link2,    className: "top-1/2 -left-8"   },
-  { icon: Brain,    className: "bottom-0 -left-6"  },
-  { icon: Database, className: "-bottom-6 right-4" },
-  { icon: Sparkles, className: "top-1/2 -right-12" },
+  { icon: Bug, className: "-top-8 -left-5" },
+  { icon: ShieldCheck, className: "-top-8 right-10" },
+  { icon: Workflow, className: "top-1/2 -left-7" },
+  { icon: Database, className: "bottom-2 -left-5" },
+  { icon: Bot, className: "-bottom-5 right-3" },
+  { icon: ClipboardCheck, className: "top-1/3 -right-8" },
 ];
 
-const stats = [
-  { value: "3+", label: "Years Experience" },
-  { value: "15+", label: "Projects" },
-  { value: "5+", label: "AI Solutions" },
+const pillars = [
+  {
+    label: "Quality Engineering",
+    note: "Where I work today",
+    color: "text-emerald-300",
+  },
+  {
+    label: "Test Automation",
+    note: "Playwright + Tosca training",
+    color: "text-amber-300",
+  },
+  {
+    label: "AI Automation",
+    note: "Project experience",
+    color: "text-cyan-300",
+  },
+  {
+    label: "Business Automation",
+    note: "GHL, Make, Zapier",
+    color: "text-cyan-300",
+  },
 ];
 
-// ─── Animation variants ────────────────────────────────────────────────────────
-
-const statsContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.15 } },
-};
-
-const statItem = {
-  hidden: { opacity: 0, y: 20 },
-  show:   { opacity: 1,  y: 0, transition: { duration: 0.5 } },
-};
-
-// ─── Component ─────────────────────────────────────────────────────────────────
+const highlights = [
+  "Functional, regression & integration testing",
+  "SAP & PeopleSoft enterprise applications",
+  "Jira defect management",
+  "UAT support",
+  "SQL data validation",
+  "Playwright + TypeScript framework",
+  "Tricentis Tosca (hands-on training)",
+  "n8n & Claude Code automation",
+  "GoHighLevel CRM (hands-on training)",
+  "Make.com & Zapier",
+];
 
 export default function About() {
   return (
-    <SectionWrapper id="about" glowPosition="top-left" className="py-28">
+    <SectionWrapper id="about" glowPosition="top-left" className="py-24">
       <div className="mx-auto max-w-7xl px-6">
-
-        {/* Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mx-auto mb-20 max-w-3xl text-center"
+          className="mx-auto mb-16 max-w-3xl text-center"
         >
-          <p className="mb-3 font-semibold uppercase tracking-[0.3em] text-cyan-400">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-400">
             About Me
           </p>
-
-          <h2 className="text-6xl font-black text-white">
-            Building Intelligent Automation Solutions
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Quality engineering, expanded with automation
           </h2>
-
-          <p className="mt-6 max-w-2xl text-lg text-slate-400">
-            I specialize in AI-powered workflows, intelligent automation,
-            API integrations, and custom business solutions that save
-            companies time and eliminate repetitive work.
-          </p>
         </motion.div>
 
-        {/* Content */}
-        <div className="grid items-center gap-24 lg:grid-cols-2">
-
-          {/* LEFT — profile image + floating icons */}
+        <div className="grid items-center gap-16 lg:grid-cols-2">
+          {/* image */}
           <motion.div
-            initial={{ opacity: 0, x: -60 }}
+            initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true }}
             className="relative flex justify-center"
           >
-            <div className="absolute h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl" />
-
+            <div className="absolute h-64 w-64 rounded-full bg-cyan-500/15 blur-3xl" />
             <div className="relative">
               <Image
-                src="/images/profile.png"
-                alt="CJ Fernando"
-                width={360}
-                height={360}
-                className="rounded-3xl border border-cyan-500/30"
-                placeholder="blur"
-                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+                src={profile.profileImage}
+                alt={profile.fullName}
+                width={340}
+                height={340}
+                className="w-64 rounded-3xl border border-cyan-500/25 sm:w-80"
               />
-
               {floatingIcons.map(({ icon: Icon, className }, i) => (
                 <motion.div
                   key={i}
-                  animate={{ y: [0, -12, 0] }}
+                  animate={{ y: [0, -10, 0] }}
                   transition={{
                     repeat: Infinity,
                     repeatType: "mirror",
-                    duration: 3 + i,
+                    duration: 3 + i * 0.6,
                     ease: "easeInOut",
                   }}
-                  className={`absolute rounded-xl border border-cyan-500/30 bg-slate-900 p-3 shadow-lg ${className}`}
+                  className={`absolute rounded-xl border border-cyan-500/25 bg-slate-900 p-2.5 shadow-lg ${className}`}
                 >
-                  <Icon className="h-6 w-6 text-cyan-400" />
+                  <Icon className="h-5 w-5 text-cyan-400" />
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* RIGHT — bio, skills, stats */}
+          {/* copy */}
           <motion.div
-            initial={{ opacity: 0, x: 60 }}
+            initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-4xl font-bold text-white">
-              Hi, I'm CJ Fernando 👋
+            <h3 className="text-2xl font-bold text-white">
+              Hi, I&apos;m {profile.name}
             </h3>
 
-            <p className="mt-6 text-lg leading-8 text-slate-400">
-              I help startups and businesses automate repetitive tasks using
-              AI, APIs, and workflow automation platforms like n8n,
-              Make.com, and Zapier.
+            <p className="mt-5 text-sm leading-7 text-slate-400 md:text-base">
+              I&apos;m a Quality Engineering Analyst at Accenture with nearly
+              four years of hands-on software testing experience. My day-to-day
+              is functional, regression and integration testing of enterprise
+              applications across <span className="text-slate-200">SAP</span> and{" "}
+              <span className="text-slate-200">PeopleSoft</span> — designing and
+              executing test cases, supporting UAT, managing defects in Jira, and
+              validating data with SQL.
             </p>
 
-            <p className="mt-6 text-lg leading-8 text-slate-400">
-              My goal is simple: build systems that reduce manual work,
-              increase productivity, and help businesses scale faster.
+            <p className="mt-4 text-sm leading-7 text-slate-400 md:text-base">
+              On top of that foundation I&apos;m building in two directions:{" "}
+              <span className="text-slate-200">test automation</span> — a
+              working Playwright and TypeScript framework, plus hands-on training
+              in Tricentis Tosca — and{" "}
+              <span className="text-slate-200">
+                AI and business automation
+              </span>{" "}
+              with n8n, Claude Code, GoHighLevel, Make.com and Zapier.
+              It&apos;s the same goal I have in QA — making delivery faster and
+              more reliable — just with more of the repetitive work handled by
+              code.
             </p>
 
-            {/* Skills */}
-            <div className="mt-10 grid grid-cols-2 gap-4">
-              {skills.map((skill) => (
-                <div
-                  key={skill}
-                  className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/60 p-4 transition hover:border-cyan-400 hover:bg-slate-900"
-                >
-                  <Check className="h-4 w-4 shrink-0 text-cyan-400" />
-                  <span className="font-medium text-white">{skill}</span>
+            {/* transition triad */}
+            <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-3">
+              {pillars.map((p, i) => (
+                <div key={p.label} className="flex items-center gap-3">
+                  {i > 0 && (
+                    <ArrowRight
+                      className="h-4 w-4 shrink-0 text-slate-600"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <div className="rounded-xl border border-slate-700 bg-slate-900/60 px-3.5 py-2">
+                    <p className={`text-sm font-semibold ${p.color}`}>
+                      {p.label}
+                    </p>
+                    <p className="text-[11px] text-slate-500">{p.note}</p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            {/* Stats */}
-            <motion.div
-              variants={statsContainer}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              className="mt-12 grid grid-cols-3 gap-6"
-            >
-              {stats.map(({ value, label }) => (
-                <motion.div key={label} variants={statItem}>
-                  <h4 className="text-4xl font-black text-cyan-400">{value}</h4>
-                  <p className="text-slate-400">{label}</p>
-                </motion.div>
+            <div className="mt-8 flex flex-wrap gap-2">
+              {highlights.map((h) => (
+                <span
+                  key={h}
+                  className="rounded-full border border-slate-700 bg-slate-900/60 px-3 py-1 text-xs text-slate-300"
+                >
+                  {h}
+                </span>
               ))}
-            </motion.div>
+            </div>
           </motion.div>
-
         </div>
       </div>
     </SectionWrapper>
